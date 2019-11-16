@@ -3,14 +3,15 @@ import java.util.Collections;
 import java.util.ArrayList;
 
 public class Player {
+    final static int SUBMARINE = 0;
     final static int LEVEL1_CHIP = 2;
     final static int LEVEL2_CHIP = 3;
     final static int LEVEL3_CHIP = 5;
     final static int LEVEL4_CHIP = 7;
     final static int ALIVE  = 2;
     final static int DEAD   = 3;
-    final static int DIVE   = 0;
-    final static int RETURN = 1;
+    final static int DIVE   = 1;
+    final static int RETURN = 0;
 
     private int point;
     private int depth; //‚Ç‚Ì‚­‚ç‚¢[‚­ö‚Á‚Ä‚¢‚é‚©
@@ -25,8 +26,8 @@ public class Player {
     }
 
     public void startRound(){ //roundŠJŽnˆ—
-        depth = 0;
-        state = 0;
+        depth = SUBMARINE;
+        state = DIVE;
         treasure.clear();
     }
 
@@ -42,6 +43,9 @@ public class Player {
                 if(depth == playerDepth[i]){
                     dice++;
                 }
+            }
+            if(depth == SUBMARINE){
+                break;
             }
         }
         if(depth > deepestPosition){

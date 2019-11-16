@@ -16,8 +16,8 @@ class DeepSeaAdventure{
    final static int NONE = -1;
    final static int ALIVE  = 2;
    final static int DEAD   = 3;
-   final static int DIVE   = 0;
-   final static int RETURN = 1;
+   final static int DIVE   = 1;
+   final static int RETURN = 0;
 
    public static int[] field = {SUBMARINE,              //0:潜水艦,-1:盤外,各レベルのチップが8個づつ
                                 LEVEL1_CHIP,LEVEL1_CHIP,LEVEL1_CHIP,LEVEL1_CHIP,LEVEL1_CHIP,LEVEL1_CHIP,LEVEL1_CHIP,LEVEL1_CHIP,
@@ -46,11 +46,12 @@ class DeepSeaAdventure{
       preparePL(numberOfPL);
       shufflePoint();
       System.out.print(CLR_COMMAND);
+
       for(int round = 1; round <= 3; round++){
          setField(numberOfPL, round);
          setPL(numberOfPL);
          System.out.println(round + " Round");
-         for(int turnPlayer = 0; oxyRest > 0; turnPlayer++,turnPlayer %= numberOfPL){
+         for(int turnPlayer = 0, returned = 0; oxyRest > 0 && returned != numberOfPL; turnPlayer++,turnPlayer %= numberOfPL){
             System.out.println("PL" + (turnPlayer+1) + "のターン  ");
             switch(PL[turnPlayer].getState()){
                case DIVE:
@@ -58,6 +59,7 @@ class DeepSeaAdventure{
                   oxyDecrease(turnPlayer);
                   drawField(numberOfPL);
                   if(playerDepth[turnPlayer] != SUBMARINE){
+                     displayTreasure(turnPlayer);
                      declareDiveOrReturn(turnPlayer);
                   }
                   diceA = diceRoll();
@@ -68,8 +70,11 @@ class DeepSeaAdventure{
                      diceTotal -= PL[turnPlayer].getTreasureNum();
                      PL[turnPlayer].diveSeaOrReturnSubmarine(diceTotal, playerDepth, numberOfPL, deepestPosition);
                      playerDepth[turnPlayer] = PL[turnPlayer].getDepth();
+                     drawField(numberOfPL);
                      switch(field[playerDepth[turnPlayer]]){
                         case SUBMARINE:
+                           PL[turnPlayer].addState(ALIVE);
+                           returned++;
                            System.out.println("PL" + (turnPlayer+1) + "は無事潜水艦に帰還しました");
                            break;
    
@@ -97,11 +102,13 @@ class DeepSeaAdventure{
 
                case ALIVE:
                   System.out.println("PL" + (turnPlayer+1) + "は帰還済みです。");
+                  break;
                
                default:
                   System.out.println("error");
             }
-            System.out.print(CLR_COMMAND);
+            System.out.println("");
+            //System.out.print(CLR_COMMAND);
          }
          decideDeadOrAlive(numberOfPL);
          endProcess(numberOfPL);
@@ -143,10 +150,18 @@ class DeepSeaAdventure{
    }
 
    public static void preparePL(int numberOfPL){
-      Player players = new Player(); 
-      for(int i = 0; i < numberOfPL; i++){
-         PL[i] = players;
-      }
+      Player player1 = new Player(); 
+      Player player2 = new Player(); 
+      Player player3 = new Player(); 
+      Player player4 = new Player(); 
+      Player player5 = new Player(); 
+      Player player6 = new Player(); 
+      PL[0] = player1;
+      PL[1] = player2;
+      PL[2] = player3;
+      PL[3] = player4;
+      PL[4] = player5;
+      PL[5] = player6;
    }
 
    public static void shufflePoint(){ //ポイントの配列をシャッフル
@@ -165,20 +180,22 @@ class DeepSeaAdventure{
 
    public static void setField(int numberOfPL, int round){ //盤面を並べる
       if(round != 1){ //round1は初期状態で並べなおす必要がない
-         for(int position = 0; position <= deepestPosition; position++){ //ブランクチップを整理し盤面を更新する
-            if(field[position] == BRANK_CHIP){
+         for(int position = 1; position <= deepestPosition; position++){ //ブランクチップを整理し盤面を更新する
+            while(field[position] == BRANK_CHIP){
                for(int i = position; i <= deepestPosition; i++){
                   field[i] = field[i+1];
                }
                deepestPosition--;
             }
          }
+         System.out.println(deepestPosition);
          oxyRest = 25; //酸素を初期状態にする
       }
    }
 
    public static void setPL(int numberOfPL){
       for(int num = 0; num < numberOfPL; num++){
+         playerDepth[num] = SUBMARINE;
          PL[num].startRound();
       }
    }
@@ -213,7 +230,26 @@ class DeepSeaAdventure{
             case LEVEL3_CHIP: System.out.print("3"); break;
             case LEVEL4_CHIP: System.out.print("4"); break;
             case BRANK_CHIP:  System.out.print("0"); break;
-            default: System.out.print("E");
+            default:
+               int level = field[position];
+               String overlapChip = "";
+               while(level % LEVEL1_CHIP == 0){
+                  level /= LEVEL1_CHIP;
+                  overlapChip = overlapChip + "1×";
+               }
+               while(level % LEVEL2_CHIP == 0){
+                  level /= LEVEL2_CHIP;
+                  overlapChip = overlapChip + "2×";
+               }
+               while(level % LEVEL3_CHIP == 0){
+                  level /= LEVEL3_CHIP;
+                  overlapChip = overlapChip + "3×";
+               }
+               while(level % LEVEL4_CHIP == 0){
+                  level /= LEVEL4_CHIP;
+                  overlapChip = overlapChip + "4×";
+               }
+               System.out.print("(" + overlapChip.substring(0, overlapChip.length()-1) + ")");
          }
       }
       System.out.println("");
@@ -238,7 +274,7 @@ class DeepSeaAdventure{
             InputStreamReader isr = new InputStreamReader(System.in);
             BufferedReader br = new BufferedReader(isr);
             String str;
-            System.out.println("進むか戻るかを宣言してください（進む：0, 戻る：1）");
+            System.out.println("進むか戻るかを宣言してください（進む：1, 戻る：0）");
             while(true){
                str = null;
                System.out.print("-> ");
@@ -306,43 +342,45 @@ class DeepSeaAdventure{
       ArrayList<Integer> treasure = PL[PLnum].getTreasurList();
       String str;
 
-      System.out.println("現在所持している宝は以下の通りです。");
-      for(int treasureNum = 0, level; treasureNum < treasure.size(); treasureNum++){
-         level = treasure.get(treasureNum);
-         if(level == LEVEL1_CHIP){
-            System.out.print("Level1,");
-         }
-         else if(level == LEVEL2_CHIP){
-            System.out.print("Level2,");
-         }
-         else if(level == LEVEL3_CHIP){
-            System.out.print("Level3,");
-         }
-         else if(level == LEVEL4_CHIP){
-            System.out.print("Level4,");
-         }
-         else{
-            str = "";
-            while(level % LEVEL1_CHIP == 0){
-               level %= LEVEL1_CHIP;
-               str = str + "1×";
+      if(PL[PLnum].getTreasureNum() > 0){
+         System.out.println("現在所持している宝は以下の通りです。");
+         for(int treasureNum = 0, level; treasureNum < treasure.size(); treasureNum++){
+            level = treasure.get(treasureNum);
+            if(level == LEVEL1_CHIP){
+               System.out.print("Level1,");
             }
-            while(level % LEVEL2_CHIP == 0){
-               level %= LEVEL2_CHIP;
-               str = str + "2×";
+            else if(level == LEVEL2_CHIP){
+               System.out.print("Level2,");
             }
-            while(level % LEVEL3_CHIP == 0){
-               level %= LEVEL3_CHIP;
-               str = str + "3×";
+            else if(level == LEVEL3_CHIP){
+               System.out.print("Level3,");
             }
-            while(level % LEVEL4_CHIP == 0){
-               level %= LEVEL4_CHIP;
-               str = str + "4×";
+            else if(level == LEVEL4_CHIP){
+               System.out.print("Level4,");
             }
-            System.out.print("Level(" + str.substring(0, str.length()-1) + "),");
+            else{
+               str = "";
+               while(level % LEVEL1_CHIP == 0){
+                  level %= LEVEL1_CHIP;
+                  str = str + "1×";
+               }
+               while(level % LEVEL2_CHIP == 0){
+                  level %= LEVEL2_CHIP;
+                  str = str + "2×";
+               }
+               while(level % LEVEL3_CHIP == 0){
+                  level %= LEVEL3_CHIP;
+                  str = str + "3×";
+               }
+               while(level % LEVEL4_CHIP == 0){
+                  level %= LEVEL4_CHIP;
+                  str = str + "4×";
+               }
+               System.out.print("Level(" + str.substring(0, str.length()-1) + "),");
+            }
          }
+         System.out.println("");
       }
-      System.out.println("");
    }
 
    public static void selectLeaveTreasure(int PLnum){
@@ -433,19 +471,19 @@ class DeepSeaAdventure{
                int level = field[depth];
                str = "";
                while(level % LEVEL1_CHIP == 0){
-                  level %= LEVEL1_CHIP;
+                  level /= LEVEL1_CHIP;
                   str = str + "1×";
                }
                while(level % LEVEL2_CHIP == 0){
-                  level %= LEVEL2_CHIP;
+                  level /= LEVEL2_CHIP;
                   str = str + "2×";
                }
                while(level % LEVEL3_CHIP == 0){
-                  level %= LEVEL3_CHIP;
+                  level /= LEVEL3_CHIP;
                   str = str + "3×";
                }
                while(level % LEVEL4_CHIP == 0){
-                  level %= LEVEL4_CHIP;
+                  level /= LEVEL4_CHIP;
                   str = str + "4×";
                }
                System.out.println("Level(" + str.substring(0, str.length()-1) + ")の宝を見つけました");
@@ -460,7 +498,6 @@ class DeepSeaAdventure{
                if(selectNum == 1){
                   PL[turnPlayer].addTreasure(field[depth]);
                   field[depth] = BRANK_CHIP;
-                  displayTreasure(turnPlayer);
                   break;
                }
                else if(selectNum == 0){
@@ -491,6 +528,8 @@ class DeepSeaAdventure{
       for(int PLnum = 0; PLnum < numberOfPL; PLnum++){
          switch(PL[PLnum].getState()){
             case ALIVE:
+               String str = "(";
+               int roundTotal = 0;
                ArrayList<Integer> levelList = new ArrayList<Integer>();
                for(int treasureNum = 0, level = 0; treasureNum < PL[PLnum].getTreasureNum(); treasureNum++){
                   level = PL[PLnum].getTreasureLevel(treasureNum);
@@ -517,33 +556,45 @@ class DeepSeaAdventure{
                   for(int j = 0; ;j++){
                      if(pointChip[levelList.get(i)][j] != NONE){
                         PL[PLnum].addPoint(pointChip[levelList.get(i)][j]);
+                        roundTotal += pointChip[levelList.get(i)][j];
+                        str = str + pointChip[levelList.get(i)][j] + ",";
                         pointChip[levelList.get(i)][j] = NONE;
                         break;
                      }
                   }
                }
+               str = str + ")";
+               System.out.print("PL"+ (PLnum+1) +"は生還しました。このラウンドの獲得Pは" + roundTotal);
+               System.out.println(str + ", 現在のトータルPは" + PL[PLnum].getPoint() + "です");
                break;
+
             case DEAD: //沈む宝を集める
+               System.out.println("PL"+ (PLnum+1) +"は生還できませんでした。獲得した宝は深海に沈みます");
                for(int treasureNum = 0; treasureNum < PL[PLnum].getTreasureNum(); treasureNum++){
                   sinkTreasureList.add(PL[PLnum].getTreasureLevel(treasureNum));
                }
                break;
+
             default:
                System.out.println("endProcess error");
          }
       }
-      while(sinkTreasureList.size() % 3 != 0){ //sinkTreasureList.size()を3で割り切れるよう調整する
-         sinkTreasureList.add(1);
+      if(sinkTreasureList.size() != 0){
+         while(sinkTreasureList.size() % 3 != 0){ //sinkTreasureList.size()を3で割り切れるよう調整する
+            sinkTreasureList.add(1);
+         }
+         for(int i = sinkTreasureList.size()-1; i >= 0; i = i - 3){
+            deepestPosition++;
+            field[deepestPosition] = sinkTreasureList.get(i) * sinkTreasureList.get(i-1) * sinkTreasureList.get(i-2);
+         }
       }
-      for(int i = sinkTreasureList.size()-1; i >= 0; i = i - 3){
-         deepestPosition++;
-         field[deepestPosition] = sinkTreasureList.get(i) *sinkTreasureList.get(i-1) *sinkTreasureList.get(i-2);
-      }
+      System.out.println("");
    }
 
    public static void resultAnnounce(int numberOfPL){
       for(int PLnum = 0; PLnum < numberOfPL; PLnum++){
-         System.out.print("PL" + (PLnum+1) + "の得点:" + PL[PLnum].getPoint());
+         System.out.print("PL" + (PLnum+1) + "の得点:" + PL[PLnum].getPoint() + ", ");
       }
+      System.out.println("");
    }
 }
