@@ -552,13 +552,20 @@ class DeepSeaAdventure{
                      }
                   }
                }
-               for(int i = 0; i < levelList.size(); i++){
+               for(int i = 0, pointChipListLevel = 0; i < levelList.size(); i++){
+                  switch(levelList.get(i)){
+                     case LEVEL1_CHIP: pointChipListLevel  = 0; break;
+                     case LEVEL2_CHIP: pointChipListLevel  = 1; break;
+                     case LEVEL3_CHIP: pointChipListLevel  = 2; break;
+                     case LEVEL4_CHIP: pointChipListLevel  = 3; break;
+                     default: System.out.println("pointChipListLevel error");
+                  }
                   for(int j = 0; ;j++){
-                     if(pointChip[levelList.get(i)][j] != NONE){
-                        PL[PLnum].addPoint(pointChip[levelList.get(i)][j]);
-                        roundTotal += pointChip[levelList.get(i)][j];
-                        str = str + pointChip[levelList.get(i)][j] + ",";
-                        pointChip[levelList.get(i)][j] = NONE;
+                     if(pointChip[pointChipListLevel][j] != NONE){
+                        PL[PLnum].addPoint(pointChip[pointChipListLevel][j]);
+                        roundTotal += pointChip[pointChipListLevel][j];
+                        str = str + pointChip[pointChipListLevel][j] + ",";
+                        pointChip[pointChipListLevel][j] = NONE;
                         break;
                      }
                   }
