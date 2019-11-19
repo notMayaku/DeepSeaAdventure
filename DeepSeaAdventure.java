@@ -630,9 +630,23 @@ class DeepSeaAdventure{
    }
 
    public static void resultAnnounce(int numberOfPL){
+      ArrayList<Integer> pointList = new ArrayList<Integer>();
       for(int PLnum = 0; PLnum < numberOfPL; PLnum++){
-         System.out.print("PL" + (PLnum+1) + "‚Ì“¾“_:" + PL[PLnum].getPoint() + ", ");
+         pointList.add(PL[PLnum].getPoint());
       }
-      System.out.println("");
+      Collections.sort(pointList, Collections.reverseOrder());
+      for(int rank = 0, sameRank; rank < numberOfPL; rank++){
+         System.out.print((rank+1) + "ˆÊ ");
+         System.out.print(String.format("%3dP: ", pointList.get(rank)));
+         sameRank = -1;
+         for(int PLnum = 0; PLnum < numberOfPL; PLnum++){
+            if(PL[PLnum].getPoint() == pointList.get(rank)){
+               System.out.print("PL" + (PLnum+1) + ", ");
+               sameRank++;
+            }
+         }
+         rank += sameRank;
+         System.out.println("");
+      }
    }
 }
