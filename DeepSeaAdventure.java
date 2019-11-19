@@ -619,7 +619,7 @@ class DeepSeaAdventure{
       }
       if(sinkTreasureList.size() != 0){
          while(sinkTreasureList.size() % 3 != 0){ //sinkTreasureList.size()‚ð3‚ÅŠ„‚èØ‚ê‚é‚æ‚¤’²®‚·‚é
-            sinkTreasureList.add(1);
+            sinkTreasureList.add(0, 1);
          }
          for(int i = sinkTreasureList.size()-1; i >= 0; i = i - 3){
             deepestPosition++;
