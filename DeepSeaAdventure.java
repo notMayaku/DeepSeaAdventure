@@ -58,7 +58,7 @@ class DeepSeaAdventure{
                case RETURN:
                   oxyDecrease(turnPlayer);
                   drawField(numberOfPL);
-                  if(playerDepth[turnPlayer] != SUBMARINE){
+                  if(PL[turnPlayer].getDepth() != SUBMARINE){
                      displayTreasure(turnPlayer);
                      declareDiveOrReturn(turnPlayer);
                   }
@@ -68,10 +68,12 @@ class DeepSeaAdventure{
                   System.out.println("サイコロ: " + diceA  + " + " + diceB + " = " + diceTotal);
                   if(diceTotal > PL[turnPlayer].getTreasureNum()){
                      diceTotal -= PL[turnPlayer].getTreasureNum();
+                     for(int i = 0; i < numberOfPL; i++){
+                        playerDepth[i] = PL[i].getDepth();
+                     }
                      PL[turnPlayer].diveSeaOrReturnSubmarine(diceTotal, playerDepth, numberOfPL, deepestPosition);
-                     playerDepth[turnPlayer] = PL[turnPlayer].getDepth();
                      drawField(numberOfPL);
-                     switch(field[playerDepth[turnPlayer]]){
+                     switch(field[PL[turnPlayer].getDepth()]){
                         case SUBMARINE:
                            PL[turnPlayer].addState(ALIVE);
                            returned++;
@@ -81,7 +83,6 @@ class DeepSeaAdventure{
                         case NONE:
                            System.out.println("盤外に出ています。強制的に潜水艦に帰還します");
                            PL[turnPlayer].addDepth(SUBMARINE);
-                           playerDepth[turnPlayer] = SUBMARINE;
                            PL[turnPlayer].addState(ALIVE);
                            break;
    
@@ -91,7 +92,7 @@ class DeepSeaAdventure{
                            break;
    
                         default:
-                           getTreasure(turnPlayer, playerDepth[turnPlayer]);
+                           getTreasure(turnPlayer, PL[turnPlayer].getDepth());
                            displayTreasure(turnPlayer);
                      }
                   }
@@ -195,7 +196,6 @@ class DeepSeaAdventure{
 
    public static void setPL(int numberOfPL){
       for(int num = 0; num < numberOfPL; num++){
-         playerDepth[num] = SUBMARINE;
          PL[num].startRound();
       }
    }
@@ -204,7 +204,7 @@ class DeepSeaAdventure{
       StringBuilder str = new StringBuilder("");
       System.out.print("SUBMARINE【 ");
       for(int PLnum = 0; PLnum < numberOfPL; PLnum++){
-         if(playerDepth[PLnum] == SUBMARINE){
+         if(PL[PLnum].getDepth() == SUBMARINE){
             System.out.print((PLnum+1) + " ");
          }
       }
@@ -215,9 +215,9 @@ class DeepSeaAdventure{
          str.append(" ");
       }
       for(int PLnum = 0; PLnum < numberOfPL; PLnum++){
-         if(playerDepth[PLnum] != 0){
-            str.deleteCharAt(playerDepth[PLnum]-1);
-            str.insert(playerDepth[PLnum]-1, PLnum+1);
+         if(PL[PLnum].getDepth() != 0){
+            str.deleteCharAt(PL[PLnum].getDepth()-1);
+            str.insert(PL[PLnum].getDepth()-1, PLnum+1);
          }
       }
       System.out.println(str.toString());
