@@ -219,7 +219,7 @@ class DeepSeaAdventure{
 
       System.out.print("ÅyÅz");
       for(int position = 1; position <= deepestPosition; position++){
-         str.append(" ");
+         str.append("+");
       }
       for(int PLnum = 0; PLnum < numberOfPL; PLnum++){
          if(PL[PLnum].getDepth() != 0){
@@ -382,19 +382,19 @@ class DeepSeaAdventure{
             else{
                str = "";
                while(level % LEVEL1_CHIP == 0){
-                  level %= LEVEL1_CHIP;
+                  level /= LEVEL1_CHIP;
                   str = str + "1Å~";
                }
                while(level % LEVEL2_CHIP == 0){
-                  level %= LEVEL2_CHIP;
+                  level /= LEVEL2_CHIP;
                   str = str + "2Å~";
                }
                while(level % LEVEL3_CHIP == 0){
-                  level %= LEVEL3_CHIP;
+                  level /= LEVEL3_CHIP;
                   str = str + "3Å~";
                }
                while(level % LEVEL4_CHIP == 0){
-                  level %= LEVEL4_CHIP;
+                  level /= LEVEL4_CHIP;
                   str = str + "4Å~";
                }
                System.out.print("Level(" + str.substring(0, str.length()-1) + "),");
@@ -429,19 +429,19 @@ class DeepSeaAdventure{
          else{
             str = "";
             while(level % LEVEL1_CHIP == 0){
-               level %= LEVEL1_CHIP;
+               level /= LEVEL1_CHIP;
                str = str + "1Å~";
             }
             while(level % LEVEL2_CHIP == 0){
-               level %= LEVEL2_CHIP;
+               level /= LEVEL2_CHIP;
                str = str + "2Å~";
             }
             while(level % LEVEL3_CHIP == 0){
-               level %= LEVEL3_CHIP;
+               level /= LEVEL3_CHIP;
                str = str + "3Å~";
             }
             while(level % LEVEL4_CHIP == 0){
-               level %= LEVEL4_CHIP;
+               level /= LEVEL4_CHIP;
                str = str + "4Å~";
             }
             System.out.println("Level(" + str.substring(0, str.length()-1) + ") " + treasureNum + ", ");
