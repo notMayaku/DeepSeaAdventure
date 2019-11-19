@@ -36,6 +36,7 @@ class DeepSeaAdventure{
 
    public static void main(String args[]){
       int numberOfPL;
+      int lastTurnPlayer = 0;
       int diceA;
       int diceB;
       int diceTotal;
@@ -51,7 +52,7 @@ class DeepSeaAdventure{
          setField(numberOfPL, round);
          setPL(numberOfPL);
          System.out.println(round + " Round");
-         for(int turnPlayer = 0, returned = 0; oxyRest > 0 && returned != numberOfPL; turnPlayer++,turnPlayer %= numberOfPL){
+         for(int turnPlayer = lastTurnPlayer, returned = 0; oxyRest > 0 && returned != numberOfPL; turnPlayer++,turnPlayer %= numberOfPL){
             System.out.println("PL" + (turnPlayer+1) + "‚Ìƒ^[ƒ“  ");
             switch(PL[turnPlayer].getState()){
                case DIVE:
@@ -108,8 +109,8 @@ class DeepSeaAdventure{
                default:
                   System.out.println("error");
             }
+            lastTurnPlayer = turnPlayer;
             System.out.println("");
-            //System.out.print(CLR_COMMAND);
          }
          decideDeadOrAlive(numberOfPL);
          endProcess(numberOfPL);
@@ -120,6 +121,7 @@ class DeepSeaAdventure{
 
    public static int decideNumberOfPlayer(){
       int numberOfPL = 0;
+      int inputNumberOfPL;
       InputStreamReader isr = new InputStreamReader(System.in);
       BufferedReader br = new BufferedReader(isr);
       String str;
@@ -129,8 +131,13 @@ class DeepSeaAdventure{
          System.out.println("-> ");
          try{
             str = br.readLine();
-            //br.close();
-            switch(Integer.parseInt(str)){
+            try{
+               inputNumberOfPL = Integer.parseInt(str);
+            }
+            catch(NumberFormatException e){
+               inputNumberOfPL = -1;
+            }
+            switch(inputNumberOfPL){
                case 2:
                case 3:
                case 4:
@@ -266,6 +273,7 @@ class DeepSeaAdventure{
    }
 
    public static void declareDiveOrReturn(int turnPlayer){
+      int inputState;
       if(PL[turnPlayer].getState() == DIVE){
          if(PL[turnPlayer].getDepth() == deepestPosition){
             PL[turnPlayer].addState(RETURN);
@@ -280,11 +288,17 @@ class DeepSeaAdventure{
                System.out.print("-> ");
                try{
                   str = br.readLine();
-                  if(Integer.parseInt(str) == RETURN){
+                  try{
+                     inputState = Integer.parseInt(str);
+                  }
+                  catch(NumberFormatException e){
+                     inputState = -1;
+                  }
+                  if(inputState == RETURN){
                      PL[turnPlayer].addState(RETURN);
                      break;
                   }
-                  else if(Integer.parseInt(str) == DIVE){
+                  else if(inputState == DIVE){
                      break;
                   }
                   else{
@@ -307,6 +321,7 @@ class DeepSeaAdventure{
    }
 
    public static void leaveTreasure(int turnPlayer){
+      int selectNum;
       if(PL[turnPlayer].getTreasureNum() > 0){
          InputStreamReader isr = new InputStreamReader(System.in);
          BufferedReader br = new BufferedReader(isr);
@@ -318,12 +333,18 @@ class DeepSeaAdventure{
             System.out.print("-> ");
             try{
                str = br.readLine();
-               if(Integer.parseInt(str) == 1){
+               try{
+                  selectNum = Integer.parseInt(str);
+               }
+               catch(NumberFormatException e){
+                  selectNum = -1;
+               }
+               if(selectNum == 1){
                   displayTreasure(turnPlayer);
                   selectLeaveTreasure(turnPlayer);
                   break;
                }
-               else if(Integer.parseInt(str) == 0){
+               else if(selectNum == 0){
                   break;
                }
                else{
@@ -433,7 +454,12 @@ class DeepSeaAdventure{
          System.out.print("-> ");
          try{
             str = br.readLine();
-            selectNum = Integer.parseInt(str);
+            try{
+               selectNum = Integer.parseInt(str);
+            }
+            catch(NumberFormatException e){
+               selectNum = -1;
+            }
             if(selectNum == treasure.size()){
                break;
             }
@@ -494,7 +520,12 @@ class DeepSeaAdventure{
             System.out.print("-> ");
             try{
                str = br.readLine();
-               selectNum = Integer.parseInt(str);
+               try{
+                  selectNum = Integer.parseInt(str);
+               }
+               catch(NumberFormatException e){
+                  selectNum = -1;
+               }
                if(selectNum == 1){
                   PL[turnPlayer].addTreasure(field[depth]);
                   field[depth] = BRANK_CHIP;
